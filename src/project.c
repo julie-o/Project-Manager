@@ -17,6 +17,17 @@
 #define FILELOCATION "data/projects/"
 
 #define DATE_FORMAT "DD-MM-YYYY"
+#define BUFFER_LENGTH 6
+
+enum project_part
+{
+	title,
+	description,
+	tags,
+	status,
+	deadline,
+	number_of_parts
+};
 
 typedef struct
 {
@@ -102,5 +113,41 @@ void add_project()
 
 void open_project()
 {
+	char name[MAX_NAME_SIZE];
+	getchar();
+	request_input("Name of file to open:", name, MAX_NAME_SIZE);
 
+	char file_path[MAX_NAME_SIZE + strlen(FILETYPE) + strlen(FILELOCATION)];
+	strcpy(file_path, FILELOCATION);
+	strcat(file_path, name);
+	strcat(file_path, FILETYPE);
+
+	FILE *fp;
+
+	char ch;
+	char *line;
+	int line_length = 0;
+	line = malloc(BUFFER_LENGTH);
+
+	enum project_part part = 0;
+
+	fp = fopen(file_path, "r");
+	while (part < number_of_parts)
+	{
+		while ((ch = fgetc(fp)) != '\n'){
+			strncat(line, &ch, 1);
+			if (strlen(line)==(BUFFER_LENGTH-1)){
+				printf("%s", line);
+				line[0] = '\0';
+			}
+		}
+
+		printf("%s\n", line);
+		line[0] = '\0';
+		part = part + 1;
+	}
+
+	fclose(fp);
+	if (line)
+		free(line);
 }

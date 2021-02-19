@@ -8,6 +8,7 @@
 
 #define EXIT 0
 #define ADD_PROJECT 1
+#define OPEN_PROJECT 2
 
 int current_action;
 int exit_prompt = 0;
@@ -22,8 +23,11 @@ void action()
 {
 	switch (current_action)
 	{
-	case 1:
+	case ADD_PROJECT:
 		add_project();
+		break;
+	case OPEN_PROJECT:
+		open_project();
 		break;
 	default:
 		printf("No such action found\n");
