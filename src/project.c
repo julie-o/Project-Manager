@@ -16,12 +16,21 @@
 #define FILETYPE ".txt"
 #define FILELOCATION "data/projects/"
 
+#define DATE_FORMAT "DD-MM-YYYY"
+
 typedef struct
 {
 	char title[MAX_NAME_SIZE];
+	struct tm deadline;
 	char description[MAX_DESC_SIZE];
 	char tags[MAX_TAGS*MAX_TAGSIZE];
 	int status;
+} project_details;
+
+typedef struct
+{
+	project_details details;
+
 } project;
 
 char *request_input(char *request, char* input, int size)
@@ -32,13 +41,25 @@ char *request_input(char *request, char* input, int size)
 	return input;
 }
 
-project init_details(){
-	project new_project;
-	
+project_details init_details()
+{
+	project_details new_project;
+
 	getchar();
 	request_input("Name the project:", new_project.title, MAX_NAME_SIZE);
 	request_input("Write a description:", new_project.description, MAX_DESC_SIZE);
 	request_input("Add tags separated by commas:", new_project.tags, MAX_TAGS * MAX_TAGSIZE);
+
+	char dl[sizeof(char) * strlen(DATE_FORMAT)];
+	request_input("Deadline, in the format DD-MM-YYYY (leave empty if none):", dl, MAX_NAME_SIZE);
+	int DD = 0, MM = 0, YYYY = 0;
+	sscanf(dl, "%02d-%02d-%04d", &DD, &MM, &YYYY);
+	struct tm deadline = {0};
+	deadline.tm_mday = DD;
+	deadline.tm_mon = MM;
+	deadline.tm_year = YYYY;
+
+	new_project.deadline = deadline;
 	new_project.status = IN_PROGRESS;
 
 	return new_project;
@@ -59,7 +80,7 @@ char* status_tostring(int status){
 
 void add_project()
 {
-	project new_project = init_details();
+	project_details new_project = init_details();
 
 	char file_path[MAX_NAME_SIZE + strlen(FILETYPE) + strlen(FILELOCATION)];
 	strcpy(file_path, FILELOCATION);
@@ -68,10 +89,18 @@ void add_project()
 
 	FILE *fp;
 	fp = fopen(file_path, "w");
-	fprintf(fp, "Name: %s\nDescription: %s\nTags: %s\nStatus: %s\n", new_project.title, new_project.description, new_project.tags, status_tostring(new_project.status));
+	fprintf(fp, "Name: %s\nDescription: %s\nTags: %s\nStatus: %s\nDeadline: %02d-%02d-%04d\n",
+			new_project.title, new_project.description, new_project.tags, status_tostring(new_project.status),
+			new_project.deadline.tm_mday, new_project.deadline.tm_mon, new_project.deadline.tm_year);
 	fclose(fp);
 
 	fp = fopen(ALL_PROJECTS, "a");
-	fprintf(fp, "{%s}{%s}{%s}{%d}\n", new_project.title, new_project.description, new_project.tags,new_project.status);
+	fprintf(fp, "{%s}{%s}{%s}{%d}{%d-%d-%d}\n", new_project.title, new_project.description, new_project.tags, new_project.status,
+			new_project.deadline.tm_mday, new_project.deadline.tm_mon, new_project.deadline.tm_year);
 	fclose(fp);
+}
+
+void open_project()
+{
+
 }
