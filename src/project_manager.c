@@ -7,11 +7,14 @@
 #include "project.c"
 
 #define EXIT 0
-
+#define ADD_PROJECT 1
 
 int current_action;
+char current_project[MAX_NAME_SIZE];
+int exit_prompt = 0;
 
-void prompt_action(){
+void prompt_action()
+{
 	printf("Choose action:\n");
 	scanf("%d", &current_action);
 }
@@ -19,10 +22,13 @@ void prompt_action(){
 void action(int current_action)
 {
 	switch (current_action) {
-		case 0:
+		case 1:
+			printf("Name the project:\n");
+			scanf("%s", current_project);
+			add_project(current_project);
 			break;
 		default:
-			// "No such action found"
+			printf("No such action found\n");
 			break;
 	}
 }
@@ -39,12 +45,13 @@ int main()
 	while (true) {
 
 		prompt_action();
-		
-		action(current_action);
 
-		if (current_action==EXIT)
+		if (current_action == EXIT)
 		{
 			break;
 		}
+
+		action(current_action);
+
 	}
 }
